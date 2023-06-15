@@ -11,6 +11,7 @@ from sklearn.cluster import KMeans
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import accuracy_score
+import pickle
 
 
 # display
@@ -62,13 +63,14 @@ with preporcessing:
     progress()
     minmax, std = st.tabs(['Minmax', 'Standart Scaler'])
     with minmax:
-      dtminmax = pd.read_csv('https://raw.githubusercontent.com/aliefakbrp/dataset/main/univaried_trans_3fitur.csv')
+      dtminmax = pd.read_csv('mm_scaler_x.csv')
       dfminmax = pd.get_dummies(dtminmax)
+      dfminmax = dfminmax.drop('index', axis=1)
       st.dataframe(dfminmax)
     with std:
-      dtstd = pd.read_csv('https://raw.githubusercontent.com/aliefakbrp/dataset/main/univaried_trans_3fitur.csv')
+      dtstd = pd.read_csv('std_scaler_x.csv')
       dfstd = pd.get_dummies(dtstd) 
-      # value = dfstd.drop('Unnamed: 0', axis=1)
+      value = dfstd.drop('Unnamed: 0', axis=1)
       st.dataframe(dfstd)
 #     st.write(value) 
 
@@ -87,39 +89,54 @@ with preporcessing:
 with modeling:
     progress()
     # pisahkan fitur dan label
-    dtminmax = pd.read_csv('https://raw.githubusercontent.com/aliefakbrp/dataset/main/univaried_trans_3fitur.csv')
-    df = pd.get_dummies(dtminmax)
-    df = df.drop('Unnamed: 0', axis=1)
-    X = df.drop('Xt', axis=1)
-    y = df['Xt']
+#     dtminmax = pd.read_csv('https://raw.githubusercontent.com/aliefakbrp/dataset/main/univaried_trans_3fitur.csv')
+#     df = pd.get_dummies(dtminmax)
+#     df = df.drop('Unnamed: 0', axis=1)
+#     X = df.drop('Xt', axis=1)
+#     y = df['Xt']
+    X = pd.read_csv("mm_scaler_x.csv")
+    X = X.drop('index', axis=1)
+    y = pd.read_csv("mm_scaler_y.csv")
+    y = y.drop('index', axis=1)
     # split data
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, train_size=0.8, random_state=1)
-    knc, regress = st.tabs(
-        ["KNeighborsClassifier", "Regressor"])
+    X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.8, random_state=1)
+    regress,knc,  = st.tabs(
+        ["Regressor","KNeighborsClassifier"])
 
+    with regress:
+        progress()
+        regress = joblib.load('model_knn_pkl.pkl')
+        y_test=y_test.to_numpy()
+        y_pred_regress = regress.predict(X_test)
+        y_pred_regress=y_pred_regress.ravel()
+
+      # Remove the index column
+        y_testt = pd.DataFrame(data=y_test,columns= ["Y_test"])
+        y_pred_regresss = pd.DataFrame(data=y_pred_regress,columns= ["Y_pred"])
+
+        hasil_y = pd.concat([y_testt,y_pred_regresss],axis=1,join="inner")
+        st.write(hasil_y)
+        from sklearn.metrics import mean_absolute_percentage_error
+
+        akurasi_regress = mean_absolute_percentage_error(y_test, y_pred_regress)
+        st.success(f'akurasi terhadap data test = {akurasi_regress}')
     with knc:
         progress()
-        clf = joblib.load('model_knn_pkl.pkl')
-        y_test=y_test.drop("")
-        st.write(y_test)
-        y_pred_clf = clf.predict(X_test)
-        st.write(y_pred_clf)
-        akurasi_clf = accuracy_score(y_test, y_pred_clf)
-        label_clf = pd.DataFrame(
-            data={'Label Test': y_test, 'Label Predict': y_pred_clf}).reset_index()
-        st.success(f'akurasi terhadap data test = {akurasi_clf}')
-        st.dataframe(label_clf)
-    with knc:
-        progress()
-        knn = joblib.load('model_knn_pkl.pkl')
+        regress = joblib.load('model_knn_pkl.pkl')
+        y_test=y_test
+        y_pred_regress = regress.predict(X_test)
+        y_pred_regress=y_pred_regress.ravel()
 
-        y_pred_knn = knn.predict(X_test)
-        akurasi_knn = accuracy_score(y_test, y_pred_knn)
-        label_knn = pd.DataFrame(
-            data={'Label Test': y_test, 'Label Predict': y_pred_knn}).reset_index()
-        st.success(f'akurasi terhadap data test = {akurasi_knn}')
-        st.dataframe(label_knn)
+      # Remove the index column
+        y_testt = pd.DataFrame(data=y_test,columns= ["Y_test"])
+        y_pred_regresss = pd.DataFrame(data=y_pred_regress,columns= ["Y_pred"])
+
+        hasil_y = pd.concat([y_testt,y_pred_regresss],axis=1,join="inner")
+        st.write(hasil_y)
+        from sklearn.metrics import mean_absolute_percentage_error
+
+        akurasi_regress = mean_absolute_percentage_error(y_test, y_pred_regress)
+        st.success(f'akurasi terhadap data test = {akurasi_regress}')
     with dtc:
         progress()
         d3 = joblib.load('d3.pkl')
