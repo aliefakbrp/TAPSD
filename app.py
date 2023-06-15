@@ -190,8 +190,8 @@ with implementation:
 #     model.compile(optimizer='adam', loss='mse')
 
 #     data = np.array([[height, weight, gander_female, gander_male]])
-    model = st.selectbox('Pilih Model', ['MLP', 'KNN', 'D3'])
-    if model == 'MLP':
+    model = st.selectbox('Pilih Model', ['Multi Layer Perceptron', 'KNN',])
+    if model == 'Multi Layer Perceptron':
         y_imp = regress.predict(X)
     elif model == 'KNN':
         y_imp = knn.predict(X)
