@@ -122,21 +122,21 @@ with modeling:
         st.success(f'akurasi terhadap data test = {akurasi_regress}')
     with knc:
         progress()
-        regress = joblib.load('model_knn_pkl_mm_sclr.pkl')
+        knn = joblib.load('model_knn_pkl_mm_sclr.pkl')
         y_test=y_test
-        y_pred_regress = regress.predict(X_test)
-        y_pred_regress=y_pred_regress.ravel()
+        y_pred_knn = knn.predict(X_test)
+        y_pred_knn=y_pred_knn.ravel()
 
       # Remove the index column
         y_testt = pd.DataFrame(data=y_test,columns= ["Y_test"])
-        y_pred_regresss = pd.DataFrame(data=y_pred_regress,columns= ["Y_pred"])
+        y_pred_knns = pd.DataFrame(data=y_pred_knn,columns= ["Y_pred"])
 
-        hasil_y = pd.concat([y_testt,y_pred_regresss],axis=1,join="inner")
+        hasil_y = pd.concat([y_testt,y_pred_knns],axis=1,join="inner")
         st.write(hasil_y)
         from sklearn.metrics import mean_absolute_percentage_error
 
-        akurasi_regress = mean_absolute_percentage_error(y_test, y_pred_regress)
-        st.success(f'akurasi terhadap data test = {akurasi_regress}')
+        akurasi_knn = mean_absolute_percentage_error(y_test, y_pred_knn)
+        st.success(f'akurasi terhadap data test = {akurasi_knn}')
     # with dtc:
     #     progress()
     #     d3 = joblib.load('d3.pkl')
@@ -149,56 +149,51 @@ with modeling:
 
 with implementation:
     # height
-    Banyak_data = st.number_input('Banyak data', value=10)
-    prediksi = st.form_submit_button("Submit")
-    if prediksi:
-        new_data=np.random.uniform(low=299631000, high=529833500, size=Banyak_data)
-        # transform univariate time series to supervised learning problem
-        from numpy import array
-        # split a univariate sequence into samples
-        def split_sequence(sequence, n_steps):
-          X, y = list(), list()
-          for i in range(len(sequence)):
-            # find the end of this pattern
-            end_ix = i + n_steps
-            # check if we are beyond the sequence
-            if end_ix > len(sequence)-1:
-              break
-            # gather input and output parts of the pattern
-            seq_x, seq_y = sequence[i:end_ix], sequence[end_ix]
-            X.append(seq_x)
-            y.append(seq_y)
-          return array(X), array(y)
-        X, y = split_sequence(new_data, 3)
-        
-        dfX = pd.DataFrame(X)
-        dfy = pd.DataFrame(y, columns=["Xt"])
-        
-        df = pd.concat((dfX, dfy), axis = 1)
-        df
-        from sklearn.preprocessing import StandardScaler
-        import joblib
-        
-        std_scaler = StandardScaler()
-        std_scaledX = std_scaler.fit_transform(dfX)
+    with st.form("my_form"):
+      Banyak_data = st.number_input('Banyak data', value=10)
+      prediksi = st.form_submit_button("Submit")
+      if prediksi:
+            new_data=np.random.uniform(low=299631000, high=529833500, size=Banyak_data)
+            # transform univariate time series to supervised learning problem
+            from numpy import array
+            # split a univariate sequence into samples
+            def split_sequence(sequence, n_steps):
+                  X, y = list(), list()
+                  for i in range(len(sequence)):
+                        # find the end of this pattern
+                        end_ix = i + n_steps
+                        # check if we are beyond the sequence
+                        if end_ix > len(sequence)-1:
+                              break
+                        # gather input and output parts of the pattern
+                        seq_x, seq_y = sequence[i:end_ix], sequence[end_ix]
+                        X.append(seq_x)
+                        y.append(seq_y)
+                  return array(X), array(y)
+            X, y = split_sequence(new_data, 3)
+            
+            dfX = pd.DataFrame(X)
+            dfy = pd.DataFrame(y, columns=["Xt"])
+            
+            df = pd.concat((dfX, dfy), axis = 1)
+            df
+            from sklearn.preprocessing import StandardScaler
+            import joblib
+            
+            std_scaler = StandardScaler()
+            std_scaledX = std_scaler.fit_transform(dfX)
 
-        features_namesX_for_std_scaler = dfX.columns.copy()
-        scaled_featuresX_with_std_scaler = pd.DataFrame(std_scaledX, columns=features_namesX_for_std_scaler)
-
-
-        regress = joblib.load('mpl_Regressor_pkl_mm_sclr.pkl')
-        y_pred_regress = regress.predict(new_data)
+            features_namesX_for_std_scaler = dfX.columns.copy()
+            scaled_featuresX_with_std_scaler = pd.DataFrame(std_scaledX, columns=features_namesX_for_std_scaler)
     
-    model.add(Dense(1))
-    model.compile(optimizer='adam', loss='mse')
+#     model.add(Dense(1))
+#     model.compile(optimizer='adam', loss='mse')
 
-    data = np.array([[height, weight, gander_female, gander_male]])
+#     data = np.array([[height, weight, gander_female, gander_male]])
     model = st.selectbox('Pilih Model', ['MLP', 'KNN', 'D3'])
     if model == 'MLP':
-        y_imp = clf.predict(data)
+        y_imp = regress.predict(X)
     elif model == 'KNN':
-        y_imp = knn.predict(data)
-    else:
-        y_imp = d3.predict(data)
+        y_imp = knn.predict(X)
     st.success(f'Model yang dipilih = {model}')
-    st.success(f'Data Predict = {label[y_imp[0]]}')
+    st.success(f'Data Predict = {y_imp[0]}')
