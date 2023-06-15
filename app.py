@@ -94,9 +94,9 @@ with modeling:
 #     df = df.drop('Unnamed: 0', axis=1)
 #     X = df.drop('Xt', axis=1)
 #     y = df['Xt']
-    X = pd.read_csv("mm_scaler_x.csv")
+    X = pd.read_csv("https://raw.githubusercontent.com/aliefakbrp/TAPSD/main/mm_scaler_x.csv")
     X = X.drop('index', axis=1)
-    y = pd.read_csv("mm_scaler_y.csv")
+    y = pd.read_csv("https://raw.githubusercontent.com/aliefakbrp/TAPSD/main/mm_scaler_y.csv")
     y = y.drop('index', axis=1)
     # split data
     X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.8, random_state=1)
