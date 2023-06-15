@@ -122,7 +122,7 @@ with modeling:
         st.success(f'akurasi terhadap data test = {akurasi_regress}')
     with knc:
         progress()
-        regress = joblib.load('model_knn_pkl_mm_slcr.pkl')
+        regress = joblib.load('model_knn_pkl_mm_sclr.pkl')
         y_test=y_test
         y_pred_regress = regress.predict(X_test)
         y_pred_regress=y_pred_regress.ravel()
