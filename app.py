@@ -25,7 +25,7 @@ def progress():
         time.sleep(5)
 
 
-st.title("UAS PENDAT")
+st.title("UAS PENDAT 20-154_Alief Akbar Purnama & 20_046_Muhammad Kurnia Sani")
 
 dataframe, preporcessing, modeling, implementation = st.tabs(
     ["Data Finance", "Prepocessing", "Modeling", "Implementation"])
