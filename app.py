@@ -149,13 +149,48 @@ with modeling:
 
 with implementation:
     # height
-    height = st.number_input('Tinggi', value=174)
-    # weight
-    weight = st.number_input('Berat', value=96)
-    # gender
-    gander = st.selectbox('Jenis Kelamin', ['Laki-Laki', 'Prempuan'])
-    gander_female = 1 if gander == 'Prempuan' else 0
-    gander_male = 1 if gander == 'Laki-Laki' else 0
+    Banyak_data = st.number_input('Banyak data', value=10)
+    prediksi = st.form_submit_button("Submit")
+    if prediksi:
+        new_data=np.random.uniform(low=299631000, high=529833500, size=Banyak_data)
+        # transform univariate time series to supervised learning problem
+        from numpy import array
+        # split a univariate sequence into samples
+        def split_sequence(sequence, n_steps):
+          X, y = list(), list()
+          for i in range(len(sequence)):
+            # find the end of this pattern
+            end_ix = i + n_steps
+            # check if we are beyond the sequence
+            if end_ix > len(sequence)-1:
+              break
+            # gather input and output parts of the pattern
+            seq_x, seq_y = sequence[i:end_ix], sequence[end_ix]
+            X.append(seq_x)
+            y.append(seq_y)
+          return array(X), array(y)
+        X, y = split_sequence(new_data, 3)
+        
+        dfX = pd.DataFrame(X)
+        dfy = pd.DataFrame(y, columns=["Xt"])
+        
+        df = pd.concat((dfX, dfy), axis = 1)
+        df
+        from sklearn.preprocessing import StandardScaler
+        import joblib
+        
+        std_scaler = StandardScaler()
+        std_scaledX = std_scaler.fit_transform(dfX)
+
+        features_namesX_for_std_scaler = dfX.columns.copy()
+        scaled_featuresX_with_std_scaler = pd.DataFrame(std_scaledX, columns=features_namesX_for_std_scaler)
+
+
+        regress = joblib.load('mpl_Regressor_pkl_mm_sclr.pkl')
+        y_pred_regress = regress.predict(new_data)
+    
+    model.add(Dense(1))
+    model.compile(optimizer='adam', loss='mse')
 
     data = np.array([[height, weight, gander_female, gander_male]])
     model = st.selectbox('Pilih Model', ['MLP', 'KNN', 'D3'])
