@@ -137,15 +137,15 @@ with modeling:
 
         akurasi_regress = mean_absolute_percentage_error(y_test, y_pred_regress)
         st.success(f'akurasi terhadap data test = {akurasi_regress}')
-    with dtc:
-        progress()
-        d3 = joblib.load('d3.pkl')
-        y_pred_d3 = d3.predict(X_test)
-        akurasi_d3 = accuracy_score(y_test, y_pred_d3)
-        label_d3 = pd.DataFrame(
-            data={'Label Test': y_test, 'Label Predict': y_pred_d3}).reset_index()
-        st.success(f'akurasi terhadap data test = {akurasi_d3}')
-        st.dataframe(label_d3)
+    # with dtc:
+    #     progress()
+    #     d3 = joblib.load('d3.pkl')
+    #     y_pred_d3 = d3.predict(X_test)
+    #     akurasi_d3 = accuracy_score(y_test, y_pred_d3)
+    #     label_d3 = pd.DataFrame(
+    #         data={'Label Test': y_test, 'Label Predict': y_pred_d3}).reset_index()
+    #     st.success(f'akurasi terhadap data test = {akurasi_d3}')
+    #     st.dataframe(label_d3)
 
 with implementation:
     # height
