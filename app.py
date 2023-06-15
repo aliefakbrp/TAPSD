@@ -19,7 +19,7 @@ import pickle
 st.set_page_config(page_title="20-154 & 20-046", page_icon='icon.png')
 
 
-@st.cache_resource()
+@st.cache()
 def progress():
     with st.spinner('Wait for it...'):
         time.sleep(5)
